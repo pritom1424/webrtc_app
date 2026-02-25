@@ -1,11 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// AUTH NOTIFIER
-// Mirrors AuthBloc — each event becomes a method
-// Uses anonymous auth + Firestore name (our approach)
-// ─────────────────────────────────────────────────────────────
-
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -17,10 +9,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final _firestore = FirebaseFirestore.instance;
 
   AuthNotifier() : super(AuthState.initial()) {
-    checkAuth(); // mirrors: CheckAuthEvent in constructor
+    checkAuth();
   }
 
-  // Mirrors: _onCheckAuth
   Future<void> checkAuth() async {
     final user = _auth.currentUser;
     if (user != null) {
@@ -37,8 +28,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  // Mirrors: _onSignInWithEmailAndPassword
-  // But uses anonymous auth + stores name in Firestore
   Future<void> signIn({
     required String loginId,
     required String password,
@@ -69,10 +58,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         UserModel(id: user.uid, name: loginId, loginId: loginId),
       );
     } on FirebaseAuthException catch (e) {
-      log(e.toString());
       state = AuthState.error(e.message ?? 'An error occurred');
     } catch (e) {
-      log(e.toString());
       state = AuthState.error('Login failed. Please try again.');
     }
   }
@@ -83,15 +70,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _auth.signOut();
       state = AuthState.unauthenticated();
     } catch (e) {
-      log(e.toString());
       state = AuthState.error(e.toString());
     }
   }
 }
-
-// ─────────────────────────────────────────────────────────────
-// PROVIDER
-// ─────────────────────────────────────────────────────────────
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
   (ref) => AuthNotifier(),

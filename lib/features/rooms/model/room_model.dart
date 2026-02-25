@@ -4,7 +4,7 @@ class RoomModel {
   final String id;
   final String name;
   final List<String> members;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   const RoomModel({
     required this.id,
@@ -19,7 +19,7 @@ class RoomModel {
       id: doc.id,
       name: data['name'] as String,
       members: List<String>.from(data['members'] as List),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
     );
   }
 

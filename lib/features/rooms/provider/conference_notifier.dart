@@ -6,7 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:webrtc_app/features/call/model/conference_state.dart';
+import 'package:webrtc_app/core/services/notification_service.dart';
+import 'package:webrtc_app/features/rooms/model/conference_state.dart';
 
 class ConferenceNotifier extends StateNotifier<ConferenceState> {
   final _firestore = FirebaseFirestore.instance;
@@ -92,6 +93,22 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
           'isVideo': isVideo,
         },
       });
+      // Get all room members and notify them
+      final roomDoc = await _firestore.collection('rooms').doc(roomId).get();
+      final roomName = roomDoc.data()?['name'] as String? ?? 'Room';
+      final members = List<String>.from(roomDoc.data()?['members'] ?? []);
+      final otherMembers = members.where((m) => m != uid).toList();
+
+      if (otherMembers.isNotEmpty) {
+        await NotificationService.instance.sendToUsers(
+          recipientUids: otherMembers,
+          title: '$myName started a call in $roomName',
+          body: isVideo
+              ? '📹 Join video conference'
+              : '📞 Join audio conference',
+          data: {'type': 'conference', 'roomId': roomId},
+        );
+      }
 
       await _joinConferenceInternal(
         roomId: roomId,

@@ -8,6 +8,7 @@ import 'package:webrtc_app/features/p2p/provider/p2p_call_notifier.dart';
 import 'package:webrtc_app/features/p2p/provider/p2p_chat_provider.dart';
 import 'package:webrtc_app/features/p2p/provider/p2p_provider.dart';
 import 'package:webrtc_app/features/p2p/screen/widgets/p2p_message_bubble.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
 
 class P2PChatScreen extends ConsumerStatefulWidget {
   final String chatId;
@@ -322,7 +323,7 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
         child: Text(e.toString(), style: const TextStyle(color: Colors.red)),
       ),
       loading: () => const Center(
-        child: CircularProgressIndicator(color: AppTheme.primaryBlue),
+        child: CircularProgressIndicator(color: AppColors.primaryBlue),
       ),
     );
   }
@@ -362,7 +363,7 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: const BorderSide(color: AppTheme.lightBlue),
+                  borderSide: const BorderSide(color: AppColors.lightBlue),
                 ),
               ),
               onSubmitted: (_) => _sendMessage(),
@@ -375,7 +376,7 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
               width: 44,
               height: 44,
               decoration: const BoxDecoration(
-                color: AppTheme.buttonBlue,
+                color: AppColors.buttonBlue,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -511,13 +512,13 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppTheme.primaryBlue.withOpacity(0.6),
+                color: AppColors.primaryBlue.withValues(alpha: 0.6),
                 width: 3,
               ),
             ),
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: AppTheme.primaryBlue.withOpacity(0.2),
+              backgroundColor: AppColors.primaryBlue.withValues(alpha: 0.2),
               child: Text(
                 name[0].toUpperCase(),
                 style: const TextStyle(
@@ -587,12 +588,12 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                color: AppColors.primaryBlue.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 isVideo ? Icons.video_call_rounded : Icons.call_rounded,
-                color: AppTheme.primaryBlue,
+                color: AppColors.primaryBlue,
                 size: 32,
               ),
             ),
@@ -603,7 +604,7 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textDark,
+                color: AppColors.textDark,
               ),
             ),
             const SizedBox(height: 4),
@@ -638,7 +639,7 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
                           isVideo: callState.isVideo,
                         ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryBlue,
+                      backgroundColor: AppColors.primaryBlue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

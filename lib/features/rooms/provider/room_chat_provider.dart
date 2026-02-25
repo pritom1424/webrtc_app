@@ -3,7 +3,8 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:webrtc_app/features/chat/model/message_model.dart';
+import 'package:webrtc_app/core/services/notification_service.dart';
+import 'package:webrtc_app/features/rooms/model/message_model.dart';
 
 class ChatNotifier extends StreamNotifier<List<MessageModel>> {
   final String roomId;
@@ -63,6 +64,18 @@ class ChatNotifier extends StreamNotifier<List<MessageModel>> {
             'senderName': senderName,
             'timestamp': FieldValue.serverTimestamp(),
           });
+      // Send notification to all other room members
+      final otherMembers = members.where((uid) => uid != user.uid).toList();
+
+      if (otherMembers.isNotEmpty) {
+        final roomName = roomData['name'] as String? ?? 'Room';
+        await NotificationService.instance.sendToUsers(
+          recipientUids: otherMembers,
+          title: '$senderName • $roomName',
+          body: message.trim(),
+          data: {'type': 'message', 'roomId': roomId},
+        );
+      }
     } catch (e, st) {
       log(e.toString());
       log(st.toString());

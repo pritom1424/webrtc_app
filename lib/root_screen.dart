@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:webrtc_app/core/theme/app_theme.dart';
-import 'package:webrtc_app/features/auth/screen/login_screen.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
+import 'package:webrtc_app/core/widgets/app_drawer.dart';
 import 'package:webrtc_app/features/notification/screen/notification_screen.dart';
+import 'package:webrtc_app/features/notification/widgets/notification_badge.dart';
 import 'package:webrtc_app/features/p2p/screen/user_list_screen.dart';
 import 'package:webrtc_app/features/profile/screen/profile_screen.dart';
 import 'package:webrtc_app/features/rooms/screen/roomlist_screen.dart';
@@ -19,7 +20,7 @@ class _RootScreenState extends State<RootScreen> {
     RoomListScreen(),
     UserListScreen(),
     NotificationScreen(),
-    ProfileScreen(),
+    ProfilePage(),
   ];
 
   @override
@@ -41,6 +42,7 @@ class _RootScreenState extends State<RootScreen> {
           ],
         ),
       ),
+      drawer: AppDrawer(),
       body: screens[currentNavIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -50,13 +52,13 @@ class _RootScreenState extends State<RootScreen> {
         }),
         items: [
           BottomNavigationBarItem(
-            backgroundColor: AppTheme.primaryBlue,
+            backgroundColor: AppColors.primaryBlue,
             icon: Icon(Icons.meeting_room),
             label: "room",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: "message"),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
+            icon: NotificationBadge(child: Icon(Icons.notifications)),
             label: "notification",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "profile"),

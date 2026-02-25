@@ -4,12 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
-import 'package:webrtc_app/core/widgets/message_bubble.dart';
-import 'package:webrtc_app/features/call/model/conference_state.dart';
-import 'package:webrtc_app/features/call/provider/conference_notifier.dart';
-import 'package:webrtc_app/features/chat/provider/room_chat_provider.dart';
-import 'package:webrtc_app/features/chat/screen/widgets/room_members_tab.dart';
+import 'package:webrtc_app/features/rooms/widgets/message_bubble.dart';
+import 'package:webrtc_app/features/rooms/model/conference_state.dart';
+import 'package:webrtc_app/features/rooms/provider/conference_notifier.dart';
+import 'package:webrtc_app/features/rooms/provider/room_chat_provider.dart';
+import 'package:webrtc_app/features/rooms/widgets/room_members_tab.dart';
 
 class RChatScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -302,7 +303,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
         controller: _tabController,
 
         labelColor: Colors.white,
-        unselectedLabelColor: AppTheme.primaryBlue,
+        unselectedLabelColor: AppColors.primaryBlue,
         labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         dividerColor: Colors.transparent,
         tabs: const [
@@ -378,7 +379,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
         ),
       ),
       loading: () => const Center(
-        child: CircularProgressIndicator(color: AppTheme.primaryBlue),
+        child: CircularProgressIndicator(color: AppColors.primaryBlue),
       ),
     );
   }
@@ -418,7 +419,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: const BorderSide(color: AppTheme.lightBlue),
+                  borderSide: const BorderSide(color: AppColors.lightBlue),
                 ),
               ),
               onSubmitted: (_) => _sendMessage(),
@@ -431,7 +432,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
               width: 44,
               height: 44,
               decoration: const BoxDecoration(
-                color: AppTheme.buttonBlue,
+                color: AppColors.buttonBlue,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -492,7 +493,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
                           color: Colors.white,
                         ),
                       ),
-                      backgroundColor: AppTheme.primaryBlue,
+                      backgroundColor: AppColors.primaryBlue,
                       padding: EdgeInsets.zero,
                     ),
                   )
@@ -618,12 +619,12 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                color: AppColors.primaryBlue.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.video_call_rounded,
-                color: AppTheme.primaryBlue,
+                color: AppColors.primaryBlue,
                 size: 32,
               ),
             ),
@@ -635,7 +636,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textDark,
+                color: AppColors.textDark,
               ),
             ),
 
@@ -686,7 +687,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
                           );
                     }, //widget.roomId
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryBlue,
+                      backgroundColor: AppColors.primaryBlue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -757,13 +758,15 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppTheme.primaryBlue.withOpacity(0.6),
+                        color: AppColors.primaryBlue.withValues(alpha: 0.6),
                         width: 3,
                       ),
                     ),
                     child: CircleAvatar(
                       radius: 40,
-                      backgroundColor: AppTheme.primaryBlue.withOpacity(0.2),
+                      backgroundColor: AppColors.primaryBlue.withValues(
+                        alpha: 0.2,
+                      ),
                       child: Text(
                         name[0].toUpperCase(),
                         style: const TextStyle(
@@ -825,7 +828,7 @@ class _RChatScreenState extends ConsumerState<RChatScreen>
               const SizedBox(height: 8),
               CircleAvatar(
                 radius: 28,
-                backgroundColor: AppTheme.buttonBlue,
+                backgroundColor: AppColors.buttonBlue,
                 child: const Icon(Icons.person, color: Colors.white, size: 28),
               ),
             ],

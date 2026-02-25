@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webrtc_app/core/services/notification_service.dart';
 import 'package:webrtc_app/features/p2p/model/p2p_message_model.dart';
 
 class P2PChatNotifier extends StreamNotifier<List<P2PMessageModel>> {
@@ -43,6 +44,18 @@ class P2PChatNotifier extends StreamNotifier<List<P2PMessageModel>> {
             'text': text,
             'timestamp': FieldValue.serverTimestamp(),
           });
+      // Get peer id — chatId format is uid1_uid2
+      final parts = chatId.split('_');
+      final peerId = parts.firstWhere((p) => p != user.uid, orElse: () => '');
+
+      if (peerId.isNotEmpty) {
+        await NotificationService.instance.sendToUser(
+          recipientUid: peerId,
+          title: name,
+          body: text,
+          data: {'type': 'message', 'chatId': chatId},
+        );
+      }
     } catch (e, st) {
       log(e.toString());
       log(st.toString());

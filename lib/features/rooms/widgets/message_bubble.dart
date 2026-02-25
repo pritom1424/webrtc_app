@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
-import 'package:webrtc_app/features/chat/model/message_model.dart';
+import 'package:webrtc_app/features/rooms/model/message_model.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageModel message;
@@ -22,13 +23,13 @@ class MessageBubble extends StatelessWidget {
           if (isMe) ...[
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.12),
+              backgroundColor: AppColors.primaryBlue.withValues(alpha: 0.12),
               child: Text(
                 message.senderName.isNotEmpty
                     ? message.senderName[0].toUpperCase()
                     : '?',
                 style: const TextStyle(
-                  color: AppTheme.primaryBlue,
+                  color: AppColors.primaryBlue,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -40,7 +41,7 @@ class MessageBubble extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isMe ? AppTheme.buttonBlue : const Color(0xFFF0F4F8),
+                color: isMe ? AppColors.buttonBlue : const Color(0xFFF0F4F8),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(18),
                   topRight: const Radius.circular(18),
@@ -66,14 +67,14 @@ class MessageBubble extends StatelessWidget {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
-                          color: AppTheme.primaryBlue,
+                          color: AppColors.primaryBlue,
                         ),
                       ),
                     ),
                   Text(
                     message.text,
                     style: TextStyle(
-                      color: isMe ? Colors.white : AppTheme.textDark,
+                      color: isMe ? Colors.white : AppColors.textDark,
                       fontSize: 14,
                     ),
                   ),

@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webrtc_app/core/constants/app_nav_paths.dart';
+import 'package:webrtc_app/core/services/notification_service.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
-import 'package:webrtc_app/features/chat/screen/roomchat_screen.dart';
+import 'package:webrtc_app/features/rooms/screen/roomchat_screen.dart';
 import 'package:webrtc_app/features/rooms/model/room_model.dart';
 import 'package:webrtc_app/features/rooms/provider/room_notifier.dart';
 import 'package:webrtc_app/features/rooms/widgets/room_tiled.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
 
 class RoomListScreen extends ConsumerStatefulWidget {
   const RoomListScreen({super.key});
@@ -32,7 +35,7 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
         title: const Text(
           'Create Room',
           style: TextStyle(
-            color: AppTheme.primaryBlue,
+            color: AppColors.primaryBlue,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -54,7 +57,7 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
               await ref.read(roomProvider.notifier).createRoom(name);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryBlue,
+              backgroundColor: AppColors.primaryBlue,
               minimumSize: const Size(80, 40),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -83,7 +86,7 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
   void _logout() async {
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/login');
+    Navigator.pushReplacementNamed(context, AppNavPaths.loginPage);
   }
 
   @override
@@ -94,18 +97,14 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Same gradient background as all screens
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppTheme.backgroundGradient,
-            ),
+            decoration: BoxDecoration(gradient: AppTheme.backgroundGradient),
           ),
 
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── App Bar ──
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
@@ -114,31 +113,8 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      /*  const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'BDCOM',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          Text(
-                            'Connecting Progress',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ), */
                       const Padding(
-                        padding: EdgeInsets
-                            .zero, //EdgeInsets.fromLTRB(20, 0, 20, 12),
+                        padding: EdgeInsets.zero,
                         child: Text(
                           'Available Rooms',
                           style: TextStyle(
@@ -170,8 +146,6 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
                     ],
                   ),
                 ),
-
-                // ── Room List Card ──
                 Expanded(
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -191,7 +165,7 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
                       child: roomsAsync.when(
                         loading: () => const Center(
                           child: CircularProgressIndicator(
-                            color: AppTheme.primaryBlue,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                         error: (e, _) => Center(
@@ -240,8 +214,8 @@ class _RoomListScreenState extends ConsumerState<RoomListScreen> {
                                 room: room,
                                 isJoined: isJoined,
                                 onJoin: () => _joinRoom(room.id),
-                                // Joined → tappable to enter room
-                                // Not joined → null = not tappable
+                                // Joined - tappable to enter room
+                                // Not joined - null = not tappable
                                 onTap: isJoined
                                     ? () => _navigateToRoom(room)
                                     : null,

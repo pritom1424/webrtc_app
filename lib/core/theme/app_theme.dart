@@ -1,47 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
 
 class AppTheme {
-  // ── Brand Colors ──────────────────────────────
-  static const Color primaryBlue = Color(0xFF1565C0); // top of gradient
-  static const Color lightBlue = Color(0xFF42A5F5); // border / accent
-  static const Color buttonBlue = Color(0xFF1E6FA5); // button bg
-  static const Color darkBlue = Color(0xFF0D47A1); // button pressed
-  static const Color white = Colors.white;
-  static const Color textDark = Color(0xFF1A1A2E);
-  static const Color textGrey = Color(0xFF9E9E9E);
-
-  // ── Gradient (use this everywhere) ───────────
-  static const LinearGradient backgroundGradient = LinearGradient(
+  static LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     stops: [0.35, 0.65],
-    colors: [primaryBlue, white],
+    colors: [AppColors.primaryBlue, AppColors.white],
   );
 
-  // ── Theme ─────────────────────────────────────
   static ThemeData get theme => ThemeData(
     useMaterial3: true,
     fontFamily: 'Roboto',
 
     colorScheme: const ColorScheme.light(
-      primary: primaryBlue,
-      onPrimary: white,
-      secondary: lightBlue,
-      onSecondary: white,
-      surface: white,
-      onSurface: textDark,
+      primary: AppColors.primaryBlue,
+      onPrimary: AppColors.white,
+      secondary: AppColors.lightBlue,
+      onSecondary: AppColors.white,
+      surface: AppColors.white,
+      onSurface: AppColors.textDark,
     ),
 
-    scaffoldBackgroundColor: white,
+    scaffoldBackgroundColor: AppColors.white,
 
     // AppBar
     appBarTheme: AppBarTheme(
-      backgroundColor: primaryBlue,
+      backgroundColor: AppColors.primaryBlue,
       elevation: 0,
-      iconTheme: IconThemeData(color: white),
+      iconTheme: IconThemeData(color: AppColors.white),
       titleTextStyle: TextStyle(
-        color: white,
+        color: AppColors.white,
         fontSize: 20,
         fontWeight: FontWeight.bold,
         letterSpacing: 1.2,
@@ -52,12 +42,12 @@ class AppTheme {
       ),
     ),
 
-    // ElevatedButton → used for all primary actions
+    // ElevatedButton
     elevatedButtonTheme: ElevatedButtonThemeData(
       style:
           ElevatedButton.styleFrom(
-            backgroundColor: buttonBlue,
-            foregroundColor: white,
+            backgroundColor: AppColors.buttonBlue,
+            foregroundColor: AppColors.white,
             //   minimumSize: const Size(double.infinity, 52),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
@@ -70,20 +60,20 @@ class AppTheme {
             ),
           ).copyWith(
             backgroundColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.pressed)) return darkBlue;
+              if (states.contains(WidgetState.pressed))
+                return AppColors.darkBlue;
               if (states.contains(WidgetState.disabled))
-                return lightBlue.withOpacity(0.5);
-              return buttonBlue;
+                return AppColors.lightBlue.withValues(alpha: 0.5);
+              return AppColors.buttonBlue;
             }),
           ),
     ),
 
-    // OutlinedButton → secondary actions
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: white,
+        foregroundColor: AppColors.white,
         minimumSize: const Size(double.infinity, 52),
-        side: const BorderSide(color: white, width: 1.5),
+        side: const BorderSide(color: AppColors.white, width: 1.5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
@@ -92,22 +82,22 @@ class AppTheme {
     // TextButton
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: primaryBlue,
+        foregroundColor: AppColors.primaryBlue,
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
       ),
     ),
 
     // Input fields
     inputDecorationTheme: InputDecorationTheme(
-      hintStyle: const TextStyle(color: textGrey),
+      hintStyle: const TextStyle(color: AppColors.textGrey),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: lightBlue),
+        borderSide: const BorderSide(color: AppColors.lightBlue),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: primaryBlue, width: 2),
+        borderSide: const BorderSide(color: AppColors.primaryBlue, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -121,9 +111,9 @@ class AppTheme {
 
     // Card
     cardTheme: CardThemeData(
-      color: white,
+      color: AppColors.white,
       elevation: 8,
-      shadowColor: Colors.black.withOpacity(0.4),
+      shadowColor: Colors.black.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),
 
@@ -135,13 +125,13 @@ class AppTheme {
 
     // CircularProgressIndicator
     progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: primaryBlue,
+      color: AppColors.primaryBlue,
     ),
 
     // SnackBar
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: textDark,
-      contentTextStyle: const TextStyle(color: white),
+      backgroundColor: AppColors.textDark,
+      contentTextStyle: const TextStyle(color: AppColors.white),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       behavior: SnackBarBehavior.floating,
     ),

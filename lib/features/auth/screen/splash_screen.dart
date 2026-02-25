@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
+import 'package:webrtc_app/core/constants/app_nav_paths.dart';
+import 'package:webrtc_app/core/constants/brand_constants.dart';
+import 'package:webrtc_app/core/services/notification_service.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -12,7 +16,6 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  //late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
 
   @override
@@ -23,11 +26,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
-    /* 
-    _fadeAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn)); */
 
     _scaleAnimation = Tween<double>(begin: 0.95, end: 1).animate(
       CurvedAnimation(
@@ -50,7 +48,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _navigate() async {
-    // Wait for animation + minimum splash duration
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
@@ -58,11 +55,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Already logged in → go to room list
-      Navigator.pushReplacementNamed(context, '/root');
+      NotificationService.instance.saveToken();
+      Navigator.pushReplacementNamed(context, AppNavPaths.rootPage);
     } else {
-      // Not logged in → go to login
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushReplacementNamed(context, AppNavPaths.loginPage);
     }
   }
 
@@ -75,42 +71,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // dark navy
+      backgroundColor: Colors.white,
       body: Center(
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon / Logo
-              /*  Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0F3460),
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF4ECCA3).withOpacity(0.4),
-                      blurRadius: 30,
-                      spreadRadius: 5,
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.video_call_rounded,
-                  size: 56,
-                  color: Color(0xFF4ECCA3),
-                ),
-              ),
-
-              const SizedBox(height: 28), */
-
               // App name
-              const Text(
-                'BDCOM',
+              Text(
+                BrandConstants.name,
                 style: TextStyle(
-                  color: const Color(0xFF0F3460), //Colors.white,
+                  color: AppColors.darkBlue,
                   fontSize: 42,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
@@ -121,9 +93,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
               // Tagline
               const Text(
-                'Connecting Progress',
+                BrandConstants.slogan,
                 style: TextStyle(
-                  color: Colors.black, //Color(0xFF4ECCA3),
+                  color: Colors.black,
                   fontStyle: FontStyle.italic,
                   fontSize: 14,
                   letterSpacing: 0.5,
@@ -138,7 +110,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  color: const Color(0xFF0F3460), //Color(0xFF4ECCA3),
+                  color: AppColors.darkBlue,
                 ),
               ),
             ],

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:webrtc_app/core/services/notification_service.dart';
 import 'package:webrtc_app/features/p2p/model/p2p_call_state.dart';
 
 // ── P2P Call Notifier ──────────────────────────────────────────────────────
@@ -136,6 +137,13 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
           'isVideo': isVideo,
         },
       });
+      // Notify receiver
+      await NotificationService.instance.sendToUser(
+        recipientUid: peerId,
+        title: '$myName is calling...',
+        body: isVideo ? '📹 Incoming video call' : '📞 Incoming audio call',
+        data: {'type': isVideo ? 'video_call' : 'call', 'chatId': chatId},
+      );
 
       await _joinInternal(
         chatId: chatId,

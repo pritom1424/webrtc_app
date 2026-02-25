@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
+import 'package:webrtc_app/core/constants/app_nav_paths.dart';
+import 'package:webrtc_app/core/constants/brand_constants.dart';
+import 'package:webrtc_app/core/services/notification_service.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/auth/model/auth_state.dart';
 import 'package:webrtc_app/features/auth/provider/auth_notifier.dart';
@@ -12,33 +16,33 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _loginIdController = TextEditingController();
+  final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _loginIdController.dispose();
+    _nameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _login() async {
+    FocusScope.of(context).unfocus();
     await ref
         .read(authProvider.notifier)
         .signIn(
-          loginId: _loginIdController.text.trim(),
+          loginId: _nameController.text.trim(),
           password: _passwordController.text.trim(),
         );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Mirrors: BlocConsumer listener
-    // Navigate on authenticated, show snackbar on error
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.isAuthenticated) {
-        Navigator.pushReplacementNamed(context, '/rooms');
+        NotificationService.instance.saveToken();
+        Navigator.pushReplacementNamed(context, AppNavPaths.rootPage);
       }
       if (next.isError && next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -50,22 +54,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
-    // Mirrors: BlocBuilder
     final authState = ref.watch(authProvider);
 
     return Scaffold(
       body: Stack(
         children: [
-          // Same gradient background
           Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.35, 0.65],
-                colors: [AppTheme.primaryBlue, Colors.white],
-              ),
-            ),
+            decoration: BoxDecoration(gradient: AppTheme.backgroundGradient),
           ),
 
           SafeArea(
@@ -73,9 +68,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // ── Logo ──
+                // Logo
                 const Text(
-                  'BDCOM',
+                  BrandConstants.name,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 40,
@@ -84,7 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const Text(
-                  'Connecting Progress',
+                  BrandConstants.slogan,
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
@@ -94,7 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 const SizedBox(height: 48),
 
-                // ── Login Card ──
+                //  Login Card
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28),
                   child: Container(
@@ -104,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
+                          color: Colors.black.withValues(alpha: 0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -114,11 +109,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         // Login ID field
                         TextField(
-                          controller: _loginIdController,
-                          style: const TextStyle(color: AppTheme.textDark),
-                          decoration: const InputDecoration(
-                            hintText: 'Login ID',
-                          ),
+                          controller: _nameController,
+                          style: const TextStyle(color: AppColors.textDark),
+                          decoration: const InputDecoration(hintText: 'Name'),
                         ),
 
                         const SizedBox(height: 16),
@@ -127,7 +120,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
-                          style: const TextStyle(color: AppTheme.textDark),
+                          style: const TextStyle(color: AppColors.textDark),
                           decoration: InputDecoration(
                             hintText: 'Password',
                             suffixIcon: IconButton(
@@ -150,8 +143,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 const SizedBox(height: 40),
 
-                // ── Login Button ──
-                // Mirrors: state.maybeWhen(loading: spinner, orElse: button)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28),
                   child: SizedBox(
@@ -160,7 +151,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: authState.isLoading ? null : _login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.buttonBlue,
+                        backgroundColor: AppColors.buttonBlue,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),

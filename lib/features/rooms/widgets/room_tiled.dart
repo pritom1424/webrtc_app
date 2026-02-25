@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/rooms/model/room_model.dart';
+import 'package:webrtc_app/features/profile/provider/profile_notifier.dart';
 
-// isJoined = true  → "Joined" chip shown, entire tile tappable
-// isJoined = false → "Join" button shown, tile NOT tappable
 class RoomTile extends StatefulWidget {
   final RoomModel room;
   final bool isJoined;
@@ -33,14 +33,14 @@ class _RoomTileState extends State<RoomTile> {
         width: 46,
         height: 46,
         decoration: BoxDecoration(
-          color: AppTheme.primaryBlue.withValues(
+          color: AppColors.primaryBlue.withValues(
             alpha: widget.isJoined ? 0.15 : 0.06,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
           Icons.meeting_room_rounded,
-          color: widget.isJoined ? AppTheme.primaryBlue : Colors.grey,
+          color: widget.isJoined ? AppColors.primaryBlue : Colors.grey,
         ),
       ),
 
@@ -48,7 +48,7 @@ class _RoomTileState extends State<RoomTile> {
         widget.room.name,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          color: widget.isJoined ? AppTheme.textDark : Colors.grey[600],
+          color: widget.isJoined ? AppColors.textDark : Colors.grey[600],
         ),
       ),
 
@@ -68,16 +68,16 @@ class _RoomTileState extends State<RoomTile> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                    color: AppColors.primaryBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: AppTheme.primaryBlue.withValues(alpha: 0.3),
+                      color: AppColors.primaryBlue.withValues(alpha: 0.3),
                     ),
                   ),
                   child: const Text(
                     'Joined',
                     style: TextStyle(
-                      color: AppTheme.primaryBlue,
+                      color: AppColors.primaryBlue,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -100,7 +100,7 @@ class _RoomTileState extends State<RoomTile> {
                         if (mounted) setState(() => _isJoining = false);
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.buttonBlue,
+                  backgroundColor: AppColors.buttonBlue,
                   minimumSize: Size.zero,
                   padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(

@@ -6,6 +6,7 @@ import 'package:webrtc_app/features/p2p/model/p2p_chat_model.dart';
 import 'package:webrtc_app/features/p2p/provider/p2p_provider.dart';
 import 'package:webrtc_app/features/p2p/screen/p2p_chat_screen.dart';
 import 'package:webrtc_app/features/p2p/screen/widgets/user_tile.dart';
+import 'package:webrtc_app/core/constants/app_colors.dart';
 
 class UserListScreen extends ConsumerWidget {
   const UserListScreen({super.key});
@@ -48,9 +49,7 @@ class UserListScreen extends ConsumerWidget {
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppTheme.backgroundGradient,
-            ),
+            decoration: BoxDecoration(gradient: AppTheme.backgroundGradient),
           ),
           SafeArea(
             child: Column(
@@ -65,28 +64,6 @@ class UserListScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      /* const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'BDCOM',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          Text(
-                            'Direct Messages',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ), */
                       const Padding(
                         padding: EdgeInsets
                             .zero, //EdgeInsets.fromLTRB(20, 0, 20, 12)
@@ -133,7 +110,7 @@ class UserListScreen extends ConsumerWidget {
                       child: usersAsync.when(
                         loading: () => const Center(
                           child: CircularProgressIndicator(
-                            color: AppTheme.primaryBlue,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                         error: (e, _) => Center(
