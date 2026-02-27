@@ -36,9 +36,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
 
   P2PCallNotifier() : super(P2PCallState.initial());
 
-  // ── Watch chat for incoming call ─────────────────────────────────────────
-  // IDENTICAL to watchRoom() — just watches p2pChats doc instead of rooms doc
-
   void watchChat(String chatId) {
     if (_watchedChatId == chatId && _chatSubscription != null) return;
 
@@ -127,7 +124,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
       final userDoc = await _firestore.collection('users').doc(uid).get();
       final myName = userDoc.data()?['name'] ?? 'Unknown';
 
-      // IDENTICAL to startConference activeConference write
       await _firestore.collection('p2pChats').doc(chatId).update({
         'activeCall': {
           'callerId': uid,
@@ -534,7 +530,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
               // Skip candidates that existed before we started this call
               final ts = change.doc.data()?['timestamp'] as Timestamp?;
               if (ts != null && ts.toDate().isBefore(listenStartTime)) {
-                print('⏭️ Skipping stale candidate');
+                //  print('⏭️ Skipping stale candidate');
                 continue;
               }
               final data = change.doc.data()!;
@@ -609,8 +605,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     }
   }
 
-  // ── Reject Call (receiver rejects) ───────────────────────────────────────
-
   Future<void> rejectCall() async {
     final chatId = state.chatId;
 
@@ -646,7 +640,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
   }
 
   Future<RTCPeerConnection> _createPeerConnection() async {
-    return await createPeerConnection({
+    /*  return await createPeerConnection({
       'iceServers': [
         {
           'urls': [
@@ -671,6 +665,52 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
         },
       ],
       'sdpSemantics': 'unified-plan',
+    }); */
+    return await createPeerConnection({
+      "iceServers": [
+        {
+          "urls": [
+            'stun:stun1.l.google.com:19302',
+            'stun:stun2.l.google.com:19302',
+            "stun:stun.relay.metered.ca:80",
+          ],
+        },
+        {
+          "urls": "turn:global.relay.metered.ca:80",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
+        },
+        {
+          "urls": "turn:global.relay.metered.ca:80?transport=tcp",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
+        },
+        {
+          "urls": "turn:global.relay.metered.ca:443",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
+        },
+        {
+          "urls": "turns:global.relay.metered.ca:443?transport=tcp",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
+        },
+        {
+          'urls': 'turn:openrelay.metered.ca:80',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+        {
+          'urls': 'turn:openrelay.metered.ca:443',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+        {
+          'urls': 'turn:openrelay.metered.ca:443?transport=tcp',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+      ],
     });
   }
 

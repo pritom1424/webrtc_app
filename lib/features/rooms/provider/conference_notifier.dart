@@ -225,13 +225,11 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
       }
       _cleanupResources();
 
-      await Future.delayed(const Duration(milliseconds: 100));
       state = ConferenceState.initial();
     } catch (e) {
       log(e.toString());
 
       _cleanupResources();
-      await Future.delayed(const Duration(milliseconds: 100));
       state = ConferenceState.initial();
     }
   }
@@ -341,21 +339,11 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
       final peerConnection = await _createPeerConnection();
 
       peerConnection.onConnectionState = (RTCPeerConnectionState s) {
-        log('🔗 Connection state with $peerId: $s');
+        print('🔗 Connection state with $peerId: $s');
       };
       peerConnection.onIceConnectionState = (RTCIceConnectionState s) {
-        log('🧊 ICE state with $peerId: $s');
+        print('🧊 ICE state with $peerId: $s');
       };
-
-      state.localStream?.getTracks().forEach((track) {
-        peerConnection.addTrack(track, state.localStream!);
-      });
-
-      final updatedConnections = Map<String, RTCPeerConnection>.from(
-        state.peerConnections,
-      );
-      updatedConnections[peerId] = peerConnection;
-      state = state.copyWith(peerConnections: updatedConnections);
 
       peerConnection.onTrack = (RTCTrackEvent event) {
         if (event.streams.isNotEmpty) {
@@ -383,6 +371,31 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
             });
       };
 
+      state.localStream?.getTracks().forEach((track) {
+        peerConnection.addTrack(track, state.localStream!);
+      });
+
+      final updatedConnections = Map<String, RTCPeerConnection>.from(
+        state.peerConnections,
+      );
+      updatedConnections[peerId] = peerConnection;
+      state = state.copyWith(peerConnections: updatedConnections);
+      // Listen for answer at: conference/peerId/answersFor/myId
+      _listenForAnswer(
+        roomId: roomId,
+        myId: myId,
+        peerId: peerId,
+        peerConnection: peerConnection,
+      );
+
+      // Listen for their ICE candidates targeting us
+      _listenForCandidates(
+        roomId: roomId,
+        myId: myId,
+        peerId: peerId,
+        peerConnection: peerConnection,
+      );
+
       // Create offer and write to: conference/myId/offersFor/peerId
       final offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
@@ -401,22 +414,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
           });
 
       log('📤 Offer written for $peerId');
-
-      // Listen for answer at: conference/peerId/answersFor/myId
-      _listenForAnswer(
-        roomId: roomId,
-        myId: myId,
-        peerId: peerId,
-        peerConnection: peerConnection,
-      );
-
-      // Listen for their ICE candidates targeting us
-      _listenForCandidates(
-        roomId: roomId,
-        myId: myId,
-        peerId: peerId,
-        peerConnection: peerConnection,
-      );
     } catch (e) {
       log('Error connecting to peer $peerId: $e');
     }
@@ -460,17 +457,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
       peerConnection.onIceConnectionState = (RTCIceConnectionState s) {
         log('🧊 Answer side - ICE state with $peerId: $s');
       };
-
-      state.localStream?.getTracks().forEach((track) {
-        peerConnection.addTrack(track, state.localStream!);
-      });
-
-      final updatedConnections = Map<String, RTCPeerConnection>.from(
-        state.peerConnections,
-      );
-      updatedConnections[peerId] = peerConnection;
-      state = state.copyWith(peerConnections: updatedConnections);
-
       peerConnection.onTrack = (RTCTrackEvent event) {
         if (event.streams.isNotEmpty) {
           final updatedStreams = Map<String, MediaStream>.from(
@@ -480,7 +466,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
           state = state.copyWith(remoteStreams: updatedStreams);
         }
       };
-
       peerConnection.onIceCandidate = (RTCIceCandidate candidate) {
         _firestore
             .collection('rooms')
@@ -492,6 +477,16 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
             .collection('items')
             .add(candidate.toMap());
       };
+
+      state.localStream?.getTracks().forEach((track) {
+        peerConnection.addTrack(track, state.localStream!);
+      });
+
+      final updatedConnections = Map<String, RTCPeerConnection>.from(
+        state.peerConnections,
+      );
+      updatedConnections[peerId] = peerConnection;
+      state = state.copyWith(peerConnections: updatedConnections);
 
       await peerConnection.setRemoteDescription(
         RTCSessionDescription(offerSdp, 'offer'),
@@ -528,6 +523,7 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
     required String myId,
     required String peerId,
   }) {
+    bool answered = false;
     final sub = _firestore
         .collection('rooms')
         .doc(roomId)
@@ -538,9 +534,11 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
         .snapshots()
         .listen((snapshot) async {
           if (!snapshot.exists) return;
+          if (answered) return; // ← guard
           final ready = snapshot.data()?['ready'] as bool? ?? false;
           if (!ready) return;
           if (state.peerConnections.containsKey(peerId)) return;
+          answered = true;
           await _checkAndAnswerOffer(
             roomId: roomId,
             myId: myId,
@@ -692,13 +690,60 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
   }
 
   Future<RTCPeerConnection> _createPeerConnection() async {
-    return await createPeerConnection({
+    /*  return await createPeerConnection({
       'iceServers': [
         {
           'urls': [
             'stun:stun1.l.google.com:19302',
             'stun:stun2.l.google.com:19302',
           ],
+        },
+        {
+          'urls': 'turn:openrelay.metered.ca:80',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+        {
+          'urls': 'turn:openrelay.metered.ca:443',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+        {
+          'urls': 'turn:openrelay.metered.ca:443?transport=tcp',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+      ],
+      'sdpSemantics': 'unified-plan',
+    }); */
+    return await createPeerConnection({
+      "iceServers": [
+        {
+          "urls": [
+            'stun:stun1.l.google.com:19302',
+            'stun:stun2.l.google.com:19302',
+            "stun:stun.relay.metered.ca:80",
+          ],
+        },
+        {
+          "urls": "turn:global.relay.metered.ca:80",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
+        },
+        {
+          "urls": "turn:global.relay.metered.ca:80?transport=tcp",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
+        },
+        {
+          "urls": "turn:global.relay.metered.ca:443",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
+        },
+        {
+          "urls": "turns:global.relay.metered.ca:443?transport=tcp",
+          "username": "4d1027cc3008d5b50b3a778b",
+          "credential": "rntBwHiqwdQasZLA",
         },
         {
           'urls': 'turn:openrelay.metered.ca:80',

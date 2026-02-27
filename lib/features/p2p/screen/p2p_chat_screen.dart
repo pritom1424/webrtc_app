@@ -469,7 +469,6 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
   // IDENTICAL to conference _buildVideoGrid — just single renderer instead of GridView
   Widget _buildVideoView(P2PCallState callState) {
     if (_remoteRenderer == null) {
-      print("null reeeeeeeemote ");
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -551,10 +550,16 @@ class _P2PChatScreenState extends ConsumerState<P2PChatScreen> {
                 ),
               ),
               const SizedBox(width: 6),
-              const Text(
-                'Connected',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              ),
+              if (_remoteRenderer == null)
+                const Text(
+                  'Connecting...',
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              if (_remoteRenderer != null)
+                const Text(
+                  'Connected',
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                ),
             ],
           ),
         ],
