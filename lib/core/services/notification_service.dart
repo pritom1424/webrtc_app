@@ -10,8 +10,6 @@ import 'package:http/http.dart' as http;
 import 'package:webrtc_app/core/constants/service_account.dart';
 import 'package:webrtc_app/features/notification/model/app_notification.dart';
 
-// ── Notification Service ───────────────────────────────────────────────────
-
 class NotificationService {
   static final NotificationService instance = NotificationService._();
   NotificationService._();
@@ -23,7 +21,7 @@ class NotificationService {
   static const _fcmEndpoint =
       'https://fcm.googleapis.com/v1/projects/webrtc-app-8a1f1/messages:send';
 
-  // ── Initialize — call once on app start after auth ────────────────────────
+  //Initialize — call once on app start after auth
 
   Future<void> initialize() async {
     final settings = await _messaging.requestPermission(
@@ -33,7 +31,7 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      log('✅ Notification permission granted');
+      log(' Notification permission granted');
       // await saveToken();
     } else {
       log('❌ Notification permission denied');
@@ -46,24 +44,22 @@ class NotificationService {
 
     // Foreground message received
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      log('📩 Foreground: ${message.notification?.title}');
+      log('Foreground: ${message.notification?.title}');
     });
 
     // Notification tapped from background
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      log('📩 Tapped: ${message.notification?.title}');
+      log('Tapped: ${message.notification?.title}');
     });
 
     // App opened from terminated state via notification
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
-      log(
-        '📩 Launched from notification: ${initialMessage.notification?.title}',
-      );
+      log('Launched from notification: ${initialMessage.notification?.title}');
     }
   }
 
-  // ── Save FCM token to users/{uid} ─────────────────────────────────────────
+  //Save FCM token to users/{uid}
 
   Future<void> saveToken() async {
     final uid = _auth.currentUser?.uid;
@@ -74,23 +70,13 @@ class NotificationService {
     log('✅ FCM token saved for $uid');
   }
 
-  /*  Future<String?> saveTokenTest() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return null;
-    final token = await _messaging.getToken();
-    return token;
-    /*   if (token == null) return;
-    await _firestore.collection('users').doc(uid).update({'fcmToken': token}); */
-    log('✅ FCM token saved for $uid');
-  } */
-
   Future<void> _updateToken(String token) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
     await _firestore.collection('users').doc(uid).update({'fcmToken': token});
   }
 
-  // ── Get access token — same approach as szaman_chat ──────────────────────
+  //Get access token
 
   Future<String> _getAccessToken() async {
     final serviceAccountJson = ServiceAccount.json;
@@ -112,7 +98,7 @@ class NotificationService {
     return credentials.accessToken.data;
   }
 
-  // ── Send to single user ───────────────────────────────────────────────────
+  // Send to single user
 
   Future<void> sendToUser({
     required String recipientUid,
@@ -146,24 +132,12 @@ class NotificationService {
           'message': {
             'token': fcmToken,
             'notification': {'title': title, 'body': body},
-            'data': {
-              'uid': recipientUid,
-            }, //{'click_action': 'FLUTTER_NOTIFICATION_CLICK', ...?data},
-            /*  'android': {
-              'priority': 'high',
-              'notification': {'sound': 'default', 'priority': 'high'},
-            },
-            'apns': {
-              'payload': {
-                'aps': {'sound': 'default', 'badge': 1},
-              },
-            }, */
+            'data': {'uid': recipientUid},
           },
         }),
       );
 
       if (response.statusCode == 200) {
-        log('✅ Push sent to $recipientUid');
         await _storeNotification(
           uid: recipientUid,
           title: title,
@@ -178,63 +152,7 @@ class NotificationService {
     }
   }
 
-  Future<void> sendToUserTest() async {
-    try {
-      final recipientUid = "IsB7wkfMiFPoZHDyDg0XC1Onq9E3";
-
-      final userDoc = await _firestore
-          .collection('users')
-          .doc(recipientUid)
-          .get();
-      final fcmToken =
-          "dzBDcnNgTTWGukujPkkf4e:APA91bF4UA5k-vIrrW5xllFjnMwP5jQjrV98jTx5k3lhKPyX7xfYfYDaCGX0d2isGnZxFS4l_TRoRTXKSw6HlxfyoHWeN5Uzm3R-IYRaYyoMUEsqL54GNY8";
-      print("accessToken started");
-      final accessToken = await _getAccessToken();
-      print("accessToken:$accessToken");
-
-      final response = await http.post(
-        Uri.parse(_fcmEndpoint),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode({
-          'message': {
-            'token': fcmToken,
-            'notification': {'title': "test Title", 'body': "testBody"},
-            'data': {
-              'uid': recipientUid,
-            }, //{'click_action': 'FLUTTER_NOTIFICATION_CLICK', ...?data},
-            /*  'android': {
-              'priority': 'high',
-              'notification': {'sound': 'default', 'priority': 'high'},
-            },
-            'apns': {
-              'payload': {
-                'aps': {'sound': 'default', 'badge': 1},
-              },
-            }, */
-          },
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        log('✅ Push sent to $recipientUid');
-        await _storeNotification(
-          uid: recipientUid,
-          title: "title",
-          body: "body",
-          data: {},
-        );
-      } else {
-        log('❌ Push failed: ${response.statusCode} ${response.body}');
-      }
-    } catch (e) {
-      log('sendToUser error: $e');
-    }
-  }
-
-  // ── Send to multiple users (room members) ────────────────────────────────
+  //Send to multiple users (room members)
 
   Future<void> sendToUsers({
     required List<String> recipientUids,
@@ -257,7 +175,7 @@ class NotificationService {
     );
   }
 
-  // ── Store notification in Firestore ──────────────────────────────────────
+  //  Store notification in Firestore
 
   Future<void> _storeNotification({
     required String uid,
@@ -278,7 +196,7 @@ class NotificationService {
         });
   }
 
-  // ── Mark as read ──────────────────────────────────────────────────────────
+  //Mark as read
 
   Future<void> markAsRead(String notificationId) async {
     final uid = _auth.currentUser?.uid;
@@ -306,8 +224,6 @@ class NotificationService {
     }
     await batch.commit();
   }
-
-  // ── Streams ───────────────────────────────────────────────────────────────
 
   Stream<int> unreadCountStream() {
     final uid = _auth.currentUser?.uid;

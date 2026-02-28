@@ -6,10 +6,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:webrtc_app/features/auth/model/user_model.dart';
 import 'package:webrtc_app/features/profile/model/profile_state.dart';
 
-// ── Profile State ──────────────────────────────────────────────────────────
-
-// ── Profile Notifier ───────────────────────────────────────────────────────
-
 class ProfileNotifier extends StateNotifier<ProfileState> {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
@@ -35,8 +31,6 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       state = ProfileState.error(state.user, 'Failed to load profile');
     }
   }
-
-  // ── Update name — reflects everywhere automatically ──────────────────────
 
   Future<void> updateName(String newName) async {
     final trimmed = newName.trim();
@@ -85,8 +79,6 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       state = ProfileState.error(state.user, 'Failed to update name');
     }
   }
-
-  // ── Update login ID ───────────────────────────────────────────────────────
 
   Future<void> updateLoginId(String newLoginId) async {
     final trimmed = newLoginId.trim();

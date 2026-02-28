@@ -64,7 +64,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  // Mirrors: _onSignOut
   Future<void> signOut() async {
     try {
       await _auth.signOut();

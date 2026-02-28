@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webrtc_app/core/constants/app_nav_paths.dart';
-import 'package:webrtc_app/core/services/notification_service.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/rooms/screen/roomchat_screen.dart';
 import 'package:webrtc_app/features/rooms/model/room_model.dart';

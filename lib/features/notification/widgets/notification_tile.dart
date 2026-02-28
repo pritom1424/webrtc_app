@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
 import 'package:webrtc_app/core/services/notification_service.dart';
-import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/notification/model/app_notification.dart';
 
 class NotificationTile extends StatelessWidget {

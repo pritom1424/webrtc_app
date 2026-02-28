@@ -97,10 +97,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
-          /* IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ), */
           const Icon(Icons.person_rounded, color: Colors.white, size: 22),
           const SizedBox(width: 8),
           const Text(
@@ -125,7 +121,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         children: [
           const SizedBox(height: 8),
 
-          // ── Avatar ────────────────────────────────────────────────────
           Stack(
             alignment: Alignment.bottomRight,
             children: [
@@ -181,7 +176,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
           const SizedBox(height: 32),
 
-          // ── Profile Fields ────────────────────────────────────────────
           _buildSectionLabel('Account Info'),
           const SizedBox(height: 12),
 
@@ -239,7 +233,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
           const SizedBox(height: 24),
 
-          // ── Account Info (read-only) ──────────────────────────────────
           _buildSectionLabel('App Info'),
           const SizedBox(height: 12),
 
@@ -251,7 +244,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
           const SizedBox(height: 32),
 
-          // ── Sign Out ──────────────────────────────────────────────────
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(

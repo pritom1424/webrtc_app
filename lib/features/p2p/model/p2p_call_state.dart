@@ -1,24 +1,15 @@
-// ── P2P Call State ─────────────────────────────────────────────────────────
-// IDENTICAL to ConferenceState except:
-//   • status enum is P2PCallStatus (idle/incoming/active) not ConferenceStatus
-//   • remoteStreams is a single MediaStream? not Map<String,MediaStream>
-//   • peerConnections is a single RTCPeerConnection? not Map<String,RTCPeerConnection>
-//   • peerId/peerName instead of memberNames map
-//   • callerName for incoming display
-//   • chatId instead of roomId
-
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 enum P2PCallStatus { idle, incoming, active }
 
 class P2PCallState {
   final P2PCallStatus status;
-  final String? chatId; // ← roomId equivalent
-  final String? callerName; // ← startedByName equivalent
+  final String? chatId;
+  final String? callerName;
   final bool isVideo;
   final MediaStream? localStream;
-  final MediaStream? remoteStream; // ← single stream (conference has Map)
-  final RTCPeerConnection? peerConnection; // ← single pc (conference has Map)
+  final MediaStream? remoteStream;
+  final RTCPeerConnection? peerConnection;
   final String? peerId;
   final String? peerName;
 

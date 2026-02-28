@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // ── Brand Colors
+  // Brand Colors
   static const Color primaryBlue = Color(0xFF1565C0); // top of gradient
   static const Color lightBlue = Color(0xFF42A5F5); // border / accent
   static const Color buttonBlue = Color(0xFF1E6FA5); // button bg

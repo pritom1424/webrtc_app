@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:webrtc_app/core/theme/app_theme.dart';
-import 'package:webrtc_app/features/p2p/provider/p2p_provider.dart';
+import 'package:webrtc_app/features/p2p/model/p2p_chat_list_model.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
 
 class UserTile extends StatelessWidget {
-  final UserModel user;
+  final P2PListUserModel user;
   final bool isAdded;
   final VoidCallback onAdd;
   final VoidCallback? onTap;
@@ -22,7 +21,7 @@ class UserTile extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: CircleAvatar(
-        backgroundColor: AppColors.primaryBlue.withOpacity(0.15),
+        backgroundColor: AppColors.primaryBlue.withValues(alpha: 0.15),
         child: Text(
           user.name[0].toUpperCase(),
           style: const TextStyle(

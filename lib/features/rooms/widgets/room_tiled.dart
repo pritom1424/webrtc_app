@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
-import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/rooms/model/room_model.dart';
-import 'package:webrtc_app/features/profile/provider/profile_notifier.dart';
 
 class RoomTile extends StatefulWidget {
   final RoomModel room;

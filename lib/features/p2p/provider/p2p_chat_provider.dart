@@ -44,7 +44,7 @@ class P2PChatNotifier extends StreamNotifier<List<P2PMessageModel>> {
             'text': text,
             'timestamp': FieldValue.serverTimestamp(),
           });
-      // Get peer id — chatId format is uid1_uid2
+      // Get peer id - chatId format is uid1_uid2
       final parts = chatId.split('_');
       final peerId = parts.firstWhere((p) => p != user.uid, orElse: () => '');
 

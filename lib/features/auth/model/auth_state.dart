@@ -13,7 +13,6 @@ class AuthState {
     this.errorMessage,
   });
 
-  // Mirrors each factory in freezed AuthState
   factory AuthState.initial() => const AuthState(status: AuthStatus.initial);
   factory AuthState.loading() => const AuthState(status: AuthStatus.loading);
   factory AuthState.authenticated(UserModel user) =>

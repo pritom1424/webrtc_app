@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/p2p/model/p2p_chat_model.dart';
-import 'package:webrtc_app/features/p2p/provider/p2p_provider.dart';
+import 'package:webrtc_app/features/p2p/provider/p2p_chat_list_provider.dart';
 import 'package:webrtc_app/features/p2p/screen/p2p_chat_screen.dart';
 import 'package:webrtc_app/features/p2p/screen/widgets/user_tile.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
@@ -28,10 +28,10 @@ class UserListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final usersAsync = ref.watch(p2pProvider);
+    final usersAsync = ref.watch(p2pChatsProvider);
     final myChatsAsync = ref.watch(myP2PChatsProvider);
 
-    // Build a set of uids we already have chats with — O(1) lookup
+    // Build a set of uids we already have chats with
     final chattedUids =
         myChatsAsync.asData?.value
             .expand((chat) => chat.participants)
@@ -159,7 +159,7 @@ class UserListScreen extends ConsumerWidget {
                                 isAdded: isAdded,
                                 onAdd: () async {
                                   final newChat = await ref
-                                      .read(p2pProvider.notifier)
+                                      .read(p2pChatsProvider.notifier)
                                       .addChat(user);
                                   if (newChat != null && context.mounted) {
                                     _navigateToChat(context, newChat);

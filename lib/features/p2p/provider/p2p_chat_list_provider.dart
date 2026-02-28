@@ -3,47 +3,30 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webrtc_app/features/p2p/model/p2p_chat_list_model.dart';
 import 'package:webrtc_app/features/p2p/model/p2p_chat_model.dart';
 
-// ── User Model ────────────────────────────────────────────────
-class UserModel {
-  final String uid;
-  final String name;
-
-  const UserModel({required this.uid, required this.name});
-
-  factory UserModel.fromDoc(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return UserModel(uid: doc.id, name: data['name'] ?? 'Unknown');
-  }
-}
-
-// ── P2P Notifier ──────────────────────────────────────────────
-// Streams all users except self
-// addChat creates a p2pChat document between two users
-
-class P2PNotifier extends StreamNotifier<List<UserModel>> {
+class P2PChatListNotifier extends StreamNotifier<List<P2PListUserModel>> {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
   @override
-  Stream<List<UserModel>> build() {
+  Stream<List<P2PListUserModel>> build() {
     final myUid = _auth.currentUser?.uid;
-    log('P2PNotifier: streaming all users');
 
     return _firestore
         .collection('users')
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
-              .map((doc) => UserModel.fromDoc(doc))
+              .map((doc) => P2PListUserModel.fromDoc(doc))
               .where((user) => user.uid != myUid) // exclude self
               .toList(),
         );
   }
 
   // Create or get existing P2P chat with a user
-  Future<P2PChatModel?> addChat(UserModel targetUser) async {
+  Future<P2PChatModel?> addChat(P2PListUserModel targetUser) async {
     try {
       final myUid = _auth.currentUser?.uid;
       if (myUid == null) throw Exception('User not authenticated');
@@ -76,11 +59,11 @@ class P2PNotifier extends StreamNotifier<List<UserModel>> {
   }
 }
 
-final p2pProvider = StreamNotifierProvider<P2PNotifier, List<UserModel>>(
-  P2PNotifier.new,
-);
+final p2pChatsProvider =
+    StreamNotifierProvider<P2PChatListNotifier, List<P2PListUserModel>>(
+      P2PChatListNotifier.new,
+    );
 
-// ── My Chats Provider ─────────────────────────────────────────
 // Streams all P2P chats the current user is part of
 // Used to check if a chat already exists with a user
 

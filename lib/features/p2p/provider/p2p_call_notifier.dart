@@ -1,22 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:webrtc_app/core/services/notification_service.dart';
 import 'package:webrtc_app/features/p2p/model/p2p_call_state.dart';
-
-// ── P2P Call Notifier ──────────────────────────────────────────────────────
-// IDENTICAL to ConferenceNotifier except:
-//   • watches p2pChats/{chatId} instead of rooms/{roomId}
-//   • activeCall field instead of activeConference field
-//   • call/ subcollection instead of conference/ subcollection
-//   • only ever connects to ONE peer (no member list, no mesh)
-//   • endCall/cancelCall/rejectCall signal via activeCall.status
-//     so the other side auto-disconnects (conference just cleans up its own doc)
 
 class P2PCallNotifier extends StateNotifier<P2PCallState> {
   final _firestore = FirebaseFirestore.instance;
@@ -25,14 +13,10 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
   String? _lastShownCallKey;
   String? _watchedChatId;
 
-  // IDENTICAL subscription pattern to conference
-  StreamSubscription? _chatSubscription; // ← _roomSubscription equivalent
-  StreamSubscription?
-  _answerSubscription; // ← _answerSubscriptions[peerId] equivalent
-  StreamSubscription?
-  _candidatesSubscription; // ← _candidateSubscriptions[peerId] equivalent
-  StreamSubscription?
-  _offerSubscription; // ← _watchOfferFromPeer sub equivalent
+  StreamSubscription? _chatSubscription;
+  StreamSubscription? _answerSubscription;
+  StreamSubscription? _candidatesSubscription;
+  StreamSubscription? _offerSubscription;
 
   P2PCallNotifier() : super(P2PCallState.initial());
 
@@ -55,7 +39,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
 
           final activeCall = data['activeCall'] as Map<String, dynamic>?;
 
-          // IDENTICAL null check to conference watchRoom
           if (activeCall == null) {
             if (state.isIncoming || state.isActive) {
               print('📵 activeCall deleted — cleaning up');
@@ -68,7 +51,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
           final callStatus = activeCall['status'] as String?;
 
           // P2P ONLY: detect ended/rejected/cancelled so other side auto-disconnects
-          // Conference doesn't need this because leaving just removes your own doc
           if (callStatus == 'ended' ||
               callStatus == 'rejected' ||
               callStatus == 'cancelled') {
@@ -189,7 +171,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     }
   }
 
-  //   • Caller connects to peer; receiver watches for caller's offer
+  // Caller connects to peer; receiver watches for caller's offer
 
   Future<void> _joinInternal({
     required String chatId,
@@ -236,60 +218,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     }
   }
 
-  // ── Connect to peer as caller — IDENTICAL to conference _connectToPeer ───
-
-  /* Future<void> _connectToPeer({
-    required String chatId,
-    required String myId,
-    required String peerId,
-  }) async {
-    try {
-      if (state.peerConnection != null) return;
-      final pc = await _createPeerConnection();
-
-      pc.onTrack = (RTCTrackEvent event) {
-        if (event.streams.isNotEmpty) {
-          state = state.copyWith(remoteStream: event.streams[0]);
-        }
-      };
-
-      pc.onIceCandidate = (RTCIceCandidate candidate) {
-        _firestore
-            .collection('p2pChats')
-            .doc(chatId)
-            .collection('call')
-            .doc(myId)
-            .collection('candidatesFor')
-            .doc(peerId)
-            .collection('items')
-            .add({
-              ...candidate.toMap(),
-              'timestamp': FieldValue.serverTimestamp(),
-            });
-      };
-
-      state.localStream?.getTracks().forEach((track) {
-        pc.addTrack(track, state.localStream!);
-      });
-
-      state = state.copyWith(peerConnection: pc);
-      _listenForCandidates(chatId: chatId, myId: myId, peerId: peerId, pc: pc);
-      _listenForAnswer(chatId: chatId, myId: myId, peerId: peerId, pc: pc);
-      final offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-
-      await _firestore
-          .collection('p2pChats')
-          .doc(chatId)
-          .collection('call')
-          .doc(myId)
-          .collection('offersFor')
-          .doc(peerId)
-          .set({'sdp': offer.sdp, 'type': offer.type, 'ready': true});
-    } catch (e) {
-      print('Error connecting to peer $peerId: $e');
-    }
-  } */
   Future<void> _connectToPeer({
     required String chatId,
     required String myId,
@@ -300,7 +228,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     final pc = await _createPeerConnection();
     pc.onConnectionState = (s) => print('🔗 P2P caller connection: $s');
     pc.onIceConnectionState = (s) => print('🧊 P2P caller ICE: $s');
-    // 1️⃣ Set onTrack FIRST
+    // 1 Set onTrack FIRST
     pc.onTrack = (RTCTrackEvent event) {
       print('🎥 Caller onTrack fired — streams: ${event.streams.length}');
       if (event.streams.isNotEmpty) {
@@ -309,7 +237,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
       }
     };
 
-    // 2️⃣ Local ICE candidate handler
+    // 2 Local ICE candidate handler
     pc.onIceCandidate = (RTCIceCandidate candidate) {
       _firestore
           .collection('p2pChats')
@@ -328,18 +256,18 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     print(
       '🔍 _connectToPeer — tracks: ${state.localStream?.getTracks().length}',
     );
-    // 3️⃣ Add local tracks AFTER onTrack
+    // 3 Add local tracks AFTER onTrack
     state.localStream?.getTracks().forEach((track) {
       pc.addTrack(track, state.localStream!);
     });
 
     state = state.copyWith(peerConnection: pc);
 
-    // 4️⃣ Start listening for answer BEFORE creating offer
+    // 4 Start listening for answer BEFORE creating offer
     _listenForAnswer(chatId: chatId, myId: myId, peerId: peerId, pc: pc);
     _listenForCandidates(chatId: chatId, myId: myId, peerId: peerId, pc: pc);
 
-    // 5️⃣ Create offer and set local description
+    // 5 Create offer and set local description
     final offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
@@ -352,8 +280,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
         .doc(peerId)
         .set({'sdp': offer.sdp, 'type': offer.type, 'ready': true});
   }
-
-  // ── Answer offer — IDENTICAL to conference _checkAndAnswerOffer ──────────
 
   Future<void> _checkAndAnswerOffer({
     required String chatId,
@@ -386,7 +312,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
 
       final pc = await _createPeerConnection();
 
-      // IDENTICAL callbacks to conference _checkAndAnswerOffer
       pc.onConnectionState = (s) => print('🔗 P2P receiver state: $s');
       pc.onIceConnectionState = (s) => print('🧊 P2P receiver ICE: $s');
 
@@ -438,8 +363,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     }
   }
 
-  // ── Watch offer from peer — IDENTICAL to conference _watchOfferFromPeer ──
-
   void _watchOfferFromPeer({
     required String chatId,
     required String myId,
@@ -467,8 +390,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
         });
   }
 
-  // ── Listen for answer — IDENTICAL to conference _listenForAnswer ─────────
-
   void _listenForAnswer({
     required String chatId,
     required String myId,
@@ -490,11 +411,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
           if (!snapshot.exists) return;
           final answerSdp = snapshot.data()?['sdp'] as String?;
           if (answerSdp == null) return;
-          // final currentDesc = await pc.getRemoteDescription();
-          // if (currentDesc != null) return;
-
-          print('✅ Answer received from $peerId');
-          print('✅ Answer received from $answerSdp');
           await pc.setRemoteDescription(
             RTCSessionDescription(answerSdp, 'answer'),
           );
@@ -504,8 +420,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
           print('📋 Caller remote desc set: ${pc.connectionState}');
         });
   }
-
-  // ── Listen for ICE candidates — IDENTICAL to conference ──────────────────
 
   void _listenForCandidates({
     required String chatId,
@@ -530,7 +444,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
               // Skip candidates that existed before we started this call
               final ts = change.doc.data()?['timestamp'] as Timestamp?;
               if (ts != null && ts.toDate().isBefore(listenStartTime)) {
-                //  print('⏭️ Skipping stale candidate');
+                //  print(' Skipping stale candidate');
                 continue;
               }
               final data = change.doc.data()!;
@@ -547,8 +461,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
         });
   }
 
-  // ── End Call — P2P ONLY: signal other side via activeCall.status ─────────
-  // Conference just removes its own doc; P2P needs to notify the other side
+  // P2P needs to notify the other side
 
   Future<void> endCall() async {
     final chatId = state.chatId;
@@ -558,7 +471,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
       if (chatId != null && uid != null) {
         await _cleanupSignaling(chatId: chatId, myId: uid);
         if (state.peerId != null) {
-          print('state.peerID ${state.peerId}');
           await _cleanupSignaling(chatId: chatId, myId: state.peerId!);
         }
         // Signal other side
@@ -578,15 +490,12 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     }
   }
 
-  // ── Cancel Call (caller while ringing) ───────────────────────────────────
-
   Future<void> cancelCall() async {
     final chatId = state.chatId;
 
     try {
       if (chatId != null) {
         if (state.peerId != null) {
-          print('state.peerID ${state.peerId}');
           await _cleanupSignaling(chatId: chatId, myId: state.peerId!);
         }
         await _firestore.collection('p2pChats').doc(chatId).update({
@@ -610,9 +519,7 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
 
     try {
       if (chatId != null) {
-        print('state.peerID ${state.peerId}');
         if (state.peerId != null) {
-          print('state.peerID ${state.peerId}');
           await _cleanupSignaling(chatId: chatId, myId: state.peerId!);
         }
         await _firestore.collection('p2pChats').doc(chatId).update({
@@ -630,8 +537,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     }
   }
 
-  // ── Helpers — IDENTICAL to conference ────────────────────────────────────
-
   Future<MediaStream> _createLocalStream(bool isVideo) async {
     return await navigator.mediaDevices.getUserMedia({
       'audio': true,
@@ -640,32 +545,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
   }
 
   Future<RTCPeerConnection> _createPeerConnection() async {
-    /*  return await createPeerConnection({
-      'iceServers': [
-        {
-          'urls': [
-            'stun:stun1.l.google.com:19302',
-            'stun:stun2.l.google.com:19302',
-          ],
-        },
-        {
-          'urls': 'turn:openrelay.metered.ca:80',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
-        },
-        {
-          'urls': 'turn:openrelay.metered.ca:443',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
-        },
-        {
-          'urls': 'turn:openrelay.metered.ca:443?transport=tcp',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
-        },
-      ],
-      'sdpSemantics': 'unified-plan',
-    }); */
     return await createPeerConnection({
       "iceServers": [
         {
@@ -714,7 +593,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     });
   }
 
-  // Clean up Firestore signaling docs for this user — IDENTICAL to leaveConference cleanup
   Future<void> _cleanupSignaling({
     required String chatId,
     required String myId,
@@ -742,7 +620,6 @@ class P2PCallNotifier extends StateNotifier<P2PCallState> {
     }
   }
 
-  // IDENTICAL to conference _cleanupResources
   void _cleanupResources() {
     _offerSubscription?.cancel();
     _answerSubscription?.cancel();

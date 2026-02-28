@@ -123,8 +123,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
     }
   }
 
-  // ── Join Conference ───────────────────────────────────────
-
   Future<void> joinConference({
     required String roomId,
     required bool isVideo,
@@ -149,8 +147,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
       state = state.copyWith(errorMessage: e.toString());
     }
   }
-
-  // ── Leave Conference ──────────────────────────────────────
 
   Future<void> leaveConference() async {
     try {
@@ -234,8 +230,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
     }
   }
 
-  // ── Dismiss incoming ──────────────────────────────────────
-
   Future<void> dismissIncoming() async {
     final roomId = state.roomId ?? '';
     final uid = _auth.currentUser?.uid;
@@ -255,8 +249,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
 
     state = ConferenceState.initial();
   }
-
-  // ── Internal join logic ───────────────────────────────────
 
   Future<void> _joinConferenceInternal({
     required String roomId,
@@ -321,8 +313,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
     // Listen for new members joining after us
     _listenForNewMembers(roomId: roomId, myId: myId);
   }
-
-  // ── Connect to a single peer (we are caller) ─────────────
 
   Future<void> _connectToPeer({
     required String roomId,
@@ -573,7 +563,7 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
           final currentDesc = await peerConnection.getRemoteDescription();
           if (currentDesc != null) return;
 
-          log('✅ Got answer from $peerId');
+          log(' Got answer from $peerId');
           await peerConnection.setRemoteDescription(
             RTCSessionDescription(answerSdp, 'answer'),
           );
@@ -680,8 +670,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
         });
   }
 
-  // ── Helpers ───────────────────────────────────────────────
-
   Future<MediaStream> _createLocalStream(bool isVideo) async {
     return await navigator.mediaDevices.getUserMedia({
       'audio': true,
@@ -690,32 +678,6 @@ class ConferenceNotifier extends StateNotifier<ConferenceState> {
   }
 
   Future<RTCPeerConnection> _createPeerConnection() async {
-    /*  return await createPeerConnection({
-      'iceServers': [
-        {
-          'urls': [
-            'stun:stun1.l.google.com:19302',
-            'stun:stun2.l.google.com:19302',
-          ],
-        },
-        {
-          'urls': 'turn:openrelay.metered.ca:80',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
-        },
-        {
-          'urls': 'turn:openrelay.metered.ca:443',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
-        },
-        {
-          'urls': 'turn:openrelay.metered.ca:443?transport=tcp',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
-        },
-      ],
-      'sdpSemantics': 'unified-plan',
-    }); */
     return await createPeerConnection({
       "iceServers": [
         {

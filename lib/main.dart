@@ -7,6 +7,7 @@ import 'package:webrtc_app/features/auth/screen/login_screen.dart';
 import 'package:webrtc_app/root_screen.dart';
 import 'firebase_options.dart';
 import 'features/auth/screen/splash_screen.dart';
+import 'package:webrtc_app/core/constants/app_nav_paths.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,13 +22,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ConnectRTC',
+      title: 'BDCOM',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      home: const SplashScreen(),
+      home: SplashScreen(),
       routes: {
-        '/login': (context) => LoginScreen(), // placeholder
-        '/root': (context) => RootScreen(), // placeholder
+        AppNavPaths.loginPage: (context) => LoginScreen(),
+        AppNavPaths.rootPage: (context) => RootScreen(),
       },
     );
   }

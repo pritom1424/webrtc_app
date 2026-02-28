@@ -6,7 +6,7 @@ import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/p2p/model/p2p_call_state.dart';
 import 'package:webrtc_app/features/p2p/provider/p2p_call_notifier.dart';
 import 'package:webrtc_app/features/p2p/provider/p2p_chat_provider.dart';
-import 'package:webrtc_app/features/p2p/provider/p2p_provider.dart';
+import 'package:webrtc_app/features/p2p/provider/p2p_chat_list_provider.dart';
 import 'package:webrtc_app/features/p2p/screen/widgets/p2p_message_bubble.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
 

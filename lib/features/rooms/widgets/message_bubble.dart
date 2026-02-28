@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
-import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/rooms/model/message_model.dart';
 
 class MessageBubble extends StatelessWidget {

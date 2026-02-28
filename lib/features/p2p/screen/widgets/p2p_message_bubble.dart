@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/p2p/model/p2p_message_model.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
 

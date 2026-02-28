@@ -5,8 +5,6 @@ import 'package:webrtc_app/core/constants/app_colors.dart';
 import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/profile/provider/profile_notifier.dart';
 
-// ── App Drawer ─────────────────────────────────────────────────────────────
-
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
@@ -18,7 +16,6 @@ class AppDrawer extends ConsumerWidget {
       backgroundColor: Colors.white,
       child: Column(
         children: [
-          // ── Header ──────────────────────────────────────────────────────
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 56, 20, 24),
@@ -64,7 +61,6 @@ class AppDrawer extends ConsumerWidget {
             ),
           ),
 
-          // ── Menu Items ──────────────────────────────────────────────────
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -98,9 +94,7 @@ class AppDrawer extends ConsumerWidget {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const PrivacyPolicyPage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const HelpDeskPage()),
                     );
                   },
                 ),
@@ -132,7 +126,6 @@ class AppDrawer extends ConsumerWidget {
             ),
           ),
 
-          // ── Footer ──────────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Text(
@@ -192,8 +185,6 @@ class _DrawerItem extends StatelessWidget {
   }
 }
 
-// ── About Page ─────────────────────────────────────────────────────────────
-
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
@@ -205,21 +196,6 @@ class AboutPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /*  Center(
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.chat_bubble_rounded,
-                color: AppTheme.primaryBlue,
-                size: 40,
-              ),
-            ),
-          ), */
           Image.asset("assets/images/company-page-banner.png"),
           const SizedBox(height: 16),
           const Center(
@@ -307,7 +283,7 @@ Issued By:	BQSR Systems Registech Private Limited, USA''',
   }
 }
 
-// ── FAQ Page ───────────────────────────────────────────────────────────────
+// FAQ Page
 
 class FaqPage extends StatelessWidget {
   const FaqPage({super.key});
@@ -468,7 +444,7 @@ class _FaqScaffoldState extends State<_FaqScaffold> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Category Dropdown ──────────────────────────────────────
+          // Category Dropdown
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
@@ -504,7 +480,7 @@ class _FaqScaffoldState extends State<_FaqScaffold> {
 
           const SizedBox(height: 16),
 
-          // ── FAQ Items ──────────────────────────────────────────────
+          //FAQ Items
           ...faqs.map((faq) => _FaqItem(question: faq.q, answer: faq.a)),
         ],
       ),
@@ -594,10 +570,10 @@ class _FaqItemState extends State<_FaqItem> {
   }
 }
 
-// ── Privacy Policy Page ────────────────────────────────────────────────────
+// Helpdesk Page
 
-class PrivacyPolicyPage extends StatelessWidget {
-  const PrivacyPolicyPage({super.key});
+class HelpDeskPage extends StatelessWidget {
+  const HelpDeskPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -731,86 +707,7 @@ class ContactPage extends StatelessWidget {
   }
 }
 
-class _ContactTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _ContactTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primaryBlue.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: AppColors.primaryBlue, size: 22),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: AppColors.textGrey,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Colors.grey.shade400,
-              size: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Shared Scaffold ────────────────────────────────────────────────────────
+// Shared Scaffold
 
 class _InfoScaffold extends StatelessWidget {
   final String title;
@@ -877,7 +774,7 @@ class _InfoScaffold extends StatelessWidget {
   }
 }
 
-// ── Shared Info Card ───────────────────────────────────────────────────────
+//  Shared Info Card
 
 class _InfoCard extends StatelessWidget {
   final String title;

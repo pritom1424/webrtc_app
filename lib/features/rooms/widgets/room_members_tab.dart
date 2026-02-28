@@ -3,9 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webrtc_app/core/constants/app_colors.dart';
-import 'package:webrtc_app/core/theme/app_theme.dart';
 import 'package:webrtc_app/features/rooms/provider/room_chat_provider.dart';
-import 'package:webrtc_app/features/profile/provider/profile_notifier.dart';
 
 class RoomMembersTab extends ConsumerWidget {
   final String roomId;
@@ -46,7 +44,7 @@ class RoomMembersTab extends ConsumerWidget {
       });
 
       if (context.mounted) {
-        Navigator.pop(context); // pop RChatScreen
+        Navigator.pop(context);
       }
     } catch (e) {
       if (context.mounted) {
@@ -146,7 +144,6 @@ class RoomMembersTab extends ConsumerWidget {
                 ),
               ),
 
-              // ── Leave Room Button ──────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 child: SizedBox(
