@@ -7,7 +7,6 @@ class RoomNotifier extends StreamNotifier<List<RoomModel>> {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
-  // Mirrors: _onLoadRooms — streams ALL rooms
   // Each room item knows if current user is a member via isMember()
   @override
   Stream<List<RoomModel>> build() {
